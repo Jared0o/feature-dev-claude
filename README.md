@@ -1,89 +1,79 @@
-# feature-dev
+# feature-dev-claude — a Claude Code plugin marketplace
 
-A Claude Code plugin that turns "I want to add a feature" into a structured, gated workflow: discover → propose → architect → implement → test → review → document. Supports **.NET, Go, React, Next.js, and Angular** projects with auto stack detection.
+A personal marketplace of Claude Code plugins maintained by [@Jared0o](https://github.com/Jared0o).
 
-## Why
-
-Vibe-coding a feature works for 30 minutes. For anything bigger, you want:
-- the agent to **read your CLAUDE.md and existing code** before proposing anything,
-- a chance to **pick between alternatives** instead of accepting the first thing it produces,
-- **gates** where you can course-correct before more code gets written,
-- **parallel review** (code + security + perf) at the end,
-- **docs and a CLAUDE.md update** so the next session has the context.
-
-`feature-dev` does all of that as a single slash command with three "size" variants.
-
-## Install
-
-### Local (development / try-before-publish)
-
-```bash
-claude --plugin-dir ~/projekty/feature-dev
-```
-
-### From GitHub
+## Install the marketplace
 
 ```
 /plugin marketplace add Jared0o/feature-dev-claude
-/plugin install feature-dev@feature-dev-claude
 ```
 
-The first command registers this repo as a Claude Code plugin marketplace (it ships with `.claude-plugin/marketplace.json`). The second installs the `feature-dev` plugin from that marketplace.
+Then install any plugin from the table below:
 
-To update later:
+```
+/plugin install <plugin-name>@feature-dev-claude
+```
+
+To pull updates later:
 
 ```
 /plugin marketplace update feature-dev-claude
-/plugin install feature-dev@feature-dev-claude
 ```
 
-After install, restart Claude Code. Verify with `/plugin` (should list `feature-dev`) and `/agents` (should list 11 `feature-dev:fd-*` agents).
+## Plugins in this marketplace
 
-## Quick start
+| Plugin | Description | Docs |
+|--------|-------------|------|
+| [`feature-dev`](plugins/feature-dev/) | Orchestrator workflow with gated phases for designing, implementing, reviewing, and documenting features (.NET / Go / React / Next.js / Angular). | [README](plugins/feature-dev/README.md) · [docs/](plugins/feature-dev/docs/) |
 
-```
-/feature-dev:run quick "add /healthz endpoint"
-/feature-dev:run standard "let users upload an avatar"
-/feature-dev:run full "add audit logging across all services"
-```
-
-Each run creates a directory `<your-repo>/.agents/feature-dev/<slug>/` containing one Markdown artifact per phase plus a running `decisions.md` ADR log. Commit it (or add it to `.gitignore` if you don't want the artifacts in your repo).
-
-## Variants — when to use which
-
-| Variant   | Use it for                              | Phases skipped vs full         |
-|-----------|-----------------------------------------|--------------------------------|
-| `quick`   | <1h tweaks, small endpoints, bug fixes  | clarify, solutions gate, integration tests, security/perf review, CLAUDE.md update |
-| `standard`| Typical features (default choice)       | perf review (unless hot path), some non-tech docs |
-| `full`    | Cross-cutting / risky / multi-service   | nothing — runs every phase     |
-
-Full breakdown in [docs/variants.md](docs/variants.md).
-
-## What runs
+## Repo layout
 
 ```
-discovery → clarify → solutions [GATE] → architecture [GATE]
-  → implementation → integration tests → review (code+security+perf) [GATE]
-  → docs → CLAUDE.md update
+.
+├── .claude-plugin/
+│   └── marketplace.json     # marketplace manifest (lists every plugin below)
+├── plugins/
+│   └── feature-dev/         # one directory per plugin
+│       ├── .claude-plugin/plugin.json
+│       ├── commands/
+│       ├── agents/
+│       ├── _shared/
+│       ├── docs/
+│       ├── README.md
+│       └── CHANGELOG.md
+├── LICENSE                   # marketplace-wide license (per-plugin LICENSE allowed if different)
+└── README.md
 ```
 
-Each phase is a separate sub-agent. See [docs/agents.md](docs/agents.md) for what each one does, which model it uses, and what tools it has.
+## Adding a new plugin
 
-## Documentation
+1. Create `plugins/<your-plugin>/` with the standard plugin layout (`.claude-plugin/plugin.json`, `commands/`, `agents/`, etc.).
+2. Append an entry to `.claude-plugin/marketplace.json`:
+   ```json
+   {
+     "name": "<your-plugin>",
+     "source": "./plugins/<your-plugin>",
+     "description": "..."
+   }
+   ```
+3. Add a row to the table above.
+4. Commit and push. Existing users pick it up via `/plugin marketplace update feature-dev-claude`.
 
-- [Architecture](docs/architecture.md) — how the orchestrator sequences sub-agents and enforces gates
-- [Agents](docs/agents.md) — one section per sub-agent
-- [Variants](docs/variants.md) — `quick` vs `standard` vs `full`
-- [Stack detection](docs/stack-detection.md) — how the plugin detects your stack and how to add a new one
-- [Artifacts](docs/artifacts.md) — what gets written to `.agents/feature-dev/<slug>/`
-- [Extending](docs/extending.md) — fork it, add your own phase
-- Examples: [Go quick](docs/examples/go-healthz.md) · [Next.js standard](docs/examples/nextjs-avatar.md) · [.NET full](docs/examples/dotnet-audit.md)
+## Local development
 
-## Requirements
+Test a single plugin without going through the marketplace:
 
-- Claude Code with plugin support
-- Project should ideally have a `CLAUDE.md` at the root — the discovery phase reads it and follows transitively-linked files
+```bash
+claude --plugin-dir ~/projekty/feature-dev/plugins/<plugin-name>
+```
+
+Or test the marketplace itself locally:
+
+```
+/plugin marketplace add C:\Users\jaroslaw.przybyl\projekty\feature-dev
+/plugin install <plugin-name>@feature-dev-claude
+```
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). Individual plugins may add their own LICENSE if different.

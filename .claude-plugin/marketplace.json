@@ -4,7 +4,7 @@
   "plugins": [
     {
       "name": "feature-dev",
-      "source": ".",
+      "source": "./plugins/feature-dev",
       "description": "Orchestrator workflow with gated phases for designing, implementing, reviewing, and documenting features (.NET / Go / React / Next.js / Angular)."
     }
   ]
