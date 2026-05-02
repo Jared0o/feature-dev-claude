@@ -1,0 +1,11 @@
+{
+  "name": "feature-dev-claude",
+  "owner": { "name": "Jared0o" },
+  "plugins": [
+    {
+      "name": "feature-dev",
+      "source": ".",
+      "description": "Orchestrator workflow with gated phases for designing, implementing, reviewing, and documenting features (.NET / Go / React / Next.js / Angular)."
+    }
+  ]
+}

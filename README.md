@@ -21,11 +21,20 @@ Vibe-coding a feature works for 30 minutes. For anything bigger, you want:
 claude --plugin-dir ~/projekty/feature-dev
 ```
 
-### From GitHub (after you publish)
+### From GitHub
 
 ```
 /plugin marketplace add Jared0o/feature-dev-claude
-/plugin install feature-dev
+/plugin install feature-dev@feature-dev-claude
+```
+
+The first command registers this repo as a Claude Code plugin marketplace (it ships with `.claude-plugin/marketplace.json`). The second installs the `feature-dev` plugin from that marketplace.
+
+To update later:
+
+```
+/plugin marketplace update feature-dev-claude
+/plugin install feature-dev@feature-dev-claude
 ```
 
 After install, restart Claude Code. Verify with `/plugin` (should list `feature-dev`) and `/agents` (should list 11 `feature-dev:fd-*` agents).
