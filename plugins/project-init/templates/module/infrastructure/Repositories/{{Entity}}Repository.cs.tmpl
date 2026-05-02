@@ -1,0 +1,36 @@
+using Microsoft.EntityFrameworkCore;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Domain;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+using {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Persistence;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Repositories;
+
+internal sealed class {{Entity}}Repository({{ModuleName}}DbContext db) : I{{Entity}}Repository
+{
+    public Task<{{Entity}}?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        => db.{{Entity}}s.FirstOrDefaultAsync(e => e.Id == id, ct);
+
+    public async Task<(IReadOnlyList<{{Entity}}> Items, int TotalCount)> GetPagedAsync(
+        int page, int pageSize, CancellationToken ct = default)
+    {
+        var query = db.{{Entity}}s.AsNoTracking().OrderByDescending(e => e.CreatedAt);
+        var total = await query.CountAsync(ct);
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(ct);
+        return (items, total);
+    }
+
+    public async Task AddAsync({{Entity}} entity, CancellationToken ct = default)
+    {
+        db.{{Entity}}s.Add(entity);
+        await db.SaveChangesAsync(ct);
+    }
+
+    public Task UpdateAsync({{Entity}} entity, CancellationToken ct = default)
+        => db.SaveChangesAsync(ct);
+
+    public async Task DeleteAsync({{Entity}} entity, CancellationToken ct = default)
+    {
+        db.{{Entity}}s.Remove(entity);
+        await db.SaveChangesAsync(ct);
+    }
+}

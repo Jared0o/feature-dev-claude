@@ -1,0 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Domain;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Persistence;
+
+public sealed class {{ModuleName}}DbContext(DbContextOptions<{{ModuleName}}DbContext> options) : DbContext(options)
+{
+    public DbSet<{{Entity}}> {{Entity}}s => Set<{{Entity}}>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.HasDefaultSchema("{{ModuleNameLower}}");
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof({{ModuleName}}DbContext).Assembly);
+    }
+}

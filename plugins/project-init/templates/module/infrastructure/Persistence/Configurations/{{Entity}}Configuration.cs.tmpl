@@ -1,0 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Domain;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Persistence.Configurations;
+
+internal sealed class {{Entity}}Configuration : IEntityTypeConfiguration<{{Entity}}>
+{
+    public void Configure(EntityTypeBuilder<{{Entity}}> builder)
+    {
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.UpdatedAt).IsRequired();
+        // TODO: configure other properties (lengths, indexes, FKs)
+    }
+}

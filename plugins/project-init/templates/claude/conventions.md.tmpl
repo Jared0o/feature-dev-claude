@@ -1,0 +1,74 @@
+# Conventions — {{SolutionName}}
+
+## Commands and queries (Core layer)
+
+- One file per command (or query) in `Core/Commands/` (or `Core/Queries/`).
+- File contains BOTH the record AND the handler. Optionally also a `FluentValidation` `AbstractValidator<T>`.
+
+```csharp
+public sealed record CreateFooCommand(string Name) : ICommand<Result<Guid>>;
+
+public sealed class CreateFooCommandHandler(IFooRepository repo)
+    : ICommandHandler<CreateFooCommand, Result<Guid>>
+{
+    public async ValueTask<Result<Guid>> Handle(CreateFooCommand cmd, CancellationToken ct)
+    {
+        var foo = new Foo { Id = Guid.CreateVersion7(), ... };
+        await repo.AddAsync(foo, ct);
+        return Result<Guid>.Success(foo.Id);
+    }
+}
+```
+
+## Errors
+
+```csharp
+public record FooNotFoundError(Guid Id)
+    : NotFoundError($"Foo '{Id}' was not found.");
+```
+
+Return errors with `Result.Failure(new FooNotFoundError(id))`. **Never throw** for business errors.
+
+## Endpoints (Api layer)
+
+Map result → HTTP with a `switch` on `res.Error`:
+
+```csharp
+return res.Error switch
+{
+    FooNotFoundError e => Results.NotFound(new { e.Type, e.Message }),
+    ValidationError e  => Results.BadRequest(new { e.Type, e.Message, e.Errors }),
+    BaseError e        => Results.BadRequest(new { e.Type, e.Message }),
+    _                  => Results.Problem("An unexpected error occurred.")
+};
+```
+
+## EF Core
+
+- DbContext name: `{ModuleName}DbContext`.
+- Schema per module: `modelBuilder.HasDefaultSchema("{modulename}")` (lowercase).
+- Connection-string key: `"{ModuleName}Context"` in `appsettings.json`.
+- Apply configurations from assembly: `modelBuilder.ApplyConfigurationsFromAssembly(typeof({ModuleName}DbContext).Assembly);`.
+
+## Cross-module events
+
+Publishing module:
+```csharp
+// Core/Events/FooHappenedEvent.cs
+public sealed record FooHappenedEvent(Guid FooId) : INotification;
+```
+
+Subscribing module references the publisher's `Core` project (NOT Infrastructure / Api):
+```csharp
+// Core/EventHandlers/OnFooHappenedHandler.cs
+public sealed class OnFooHappenedHandler : INotificationHandler<FooHappenedEvent>
+{
+    public ValueTask Handle(FooHappenedEvent notification, CancellationToken ct) => default;
+}
+```
+
+## Packages
+
+- Versions live ONLY in `Directory.Packages.props`. `<PackageReference>` in csproj is just `Include="X"` (no `Version=`).
+- Mediator: `Mediator.SourceGenerator` ONLY in `{{SolutionName}}.Api`; `Mediator.Abstractions` in any project that defines messages or handlers.
+- FluentValidation lives in `Core` (validators are register-by-assembly via `AddValidatorsFromAssemblyContaining<>` in each module's `Add{Module}Core`).

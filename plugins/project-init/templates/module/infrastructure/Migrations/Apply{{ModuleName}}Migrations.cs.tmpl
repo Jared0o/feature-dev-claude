@@ -1,0 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Persistence;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Migrations;
+
+public static class Apply{{ModuleName}}Migrations
+{
+    public static async Task ApplyAsync(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<{{ModuleName}}DbContext>();
+        // Until you add a real migration with `dotnet ef migrations add Initial{{ModuleName}}`,
+        // EnsureCreatedAsync gives you a working schema. Remove this and call MigrateAsync once you have migrations.
+        await db.Database.EnsureCreatedAsync();
+    }
+}

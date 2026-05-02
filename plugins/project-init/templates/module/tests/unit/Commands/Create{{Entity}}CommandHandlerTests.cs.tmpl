@@ -1,0 +1,32 @@
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Commands;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Tests.Unit.Commands;
+
+public sealed class Create{{Entity}}CommandHandlerTests
+{
+    private readonly I{{Entity}}Repository _repository = Substitute.For<I{{Entity}}Repository>();
+    private readonly Create{{Entity}}CommandHandler _sut;
+
+    public Create{{Entity}}CommandHandlerTests()
+    {
+        _sut = new Create{{Entity}}CommandHandler(_repository);
+    }
+
+    [Fact]
+    public async Task Handle_WhenValidCommand_PersistsEntityAndReturnsId()
+    {
+        var cmd = TestData.ValidCreateCommand();
+
+        var result = await _sut.Handle(cmd, default);
+
+        Assert.True(result.IsSuccess);
+        Assert.NotEqual(Guid.Empty, result.Value);
+        await _repository.Received(1).AddAsync(Arg.Any<{{Entity}}>(), Arg.Any<CancellationToken>());
+    }
+
+    private static class TestData
+    {
+        // TODO: replace with realistic command construction once Create{{Entity}}Command shape is finalized
+        public static Create{{Entity}}Command ValidCreateCommand() => new();
+    }
+}

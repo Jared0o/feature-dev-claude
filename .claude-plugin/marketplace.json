@@ -6,6 +6,11 @@
       "name": "feature-dev",
       "source": "./plugins/feature-dev",
       "description": "Orchestrator workflow with gated phases for designing, implementing, reviewing, and documenting features (.NET / Go / React / Next.js / Angular)."
+    },
+    {
+      "name": "project-init",
+      "source": "./plugins/project-init",
+      "description": ".NET 10 modular monolith scaffolder — initializes a solution and adds modules following the architecture of Jared0o/Ecommerce (Mediator, Result<T>, EF Core+Postgres, xunit+Testcontainers)."
     }
   ]
 }

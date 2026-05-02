@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\{{SolutionName}}.Modules.{{ModuleName}}.Core\{{SolutionName}}.Modules.{{ModuleName}}.Core.csproj" />
+    <ProjectReference Include="..\{{SolutionName}}.Modules.{{ModuleName}}.Infrastructure\{{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Shared\{{SolutionName}}.Shared.Abstraction\{{SolutionName}}.Shared.Abstraction.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Mediator.Abstractions" />
+  </ItemGroup>
+</Project>

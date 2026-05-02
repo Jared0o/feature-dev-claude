@@ -1,0 +1,22 @@
+# Testing — {{SolutionName}}
+
+## Layers
+
+- **Unit** (`tests/{{SolutionName}}.Modules.{Name}.Tests.Unit/`) — xunit + NSubstitute. Mock `I{Entity}Repository` and unit-test command/query handlers. **Never mock the DbContext.**
+- **Integration** (`tests/{{SolutionName}}.Modules.{Name}.Tests.Integration/`) — xunit + `Testcontainers.PostgreSql`. Real Postgres 17 container, real `DbContext`, exercise the repository through its public API. Use `IClassFixture<{Name}DbFixture>` to share a container per test class.
+
+## Conventions
+
+- Test name: `{Method}_{Scenario}_{ExpectedResult}` (e.g. `Handle_WhenFooNotFound_ReturnsFailure`).
+- Use `Guid.CreateVersion7()` in tests — never `Guid.NewGuid()`.
+- Always `fixture.Db.ChangeTracker.Clear()` between operations in integration tests to avoid stale tracking state.
+
+## Running
+
+```bash
+dotnet test                                                                        # all
+dotnet test --filter "FullyQualifiedName~{{SolutionName}}.Modules.{Name}.Tests.Unit" # one project
+dotnet test --filter "FullyQualifiedName~Handle_WhenFooNotFound"                   # one test
+```
+
+Integration tests need Docker running (Testcontainers).

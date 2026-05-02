@@ -1,0 +1,25 @@
+# Decisions — {{SolutionName}}
+
+Append-only ADR log. Newest entry on top.
+
+## ADR-0001 — Modular monolith with reflection-based auto-discovery
+
+**Date:** scaffolded by `/project-init:init`
+**Status:** Accepted
+
+We chose a modular monolith (single deployable, multiple modules each with own DB schema) over microservices because:
+- Operational simplicity at this stage (one container, one CI/CD pipeline).
+- Strong static linking — refactors across modules are compile-time safe.
+- Modules are isolated enough (own assembly, own schema, no cross-module Infrastructure references) that any one of them can be extracted into its own service later if needed.
+
+Auto-discovery via `IModule` + `ModuleLoader` reflection means adding a module never touches `Program.cs`.
+
+## ADR-0002 — `Result<T>` instead of exceptions for business errors
+
+**Date:** scaffolded by `/project-init:init`
+**Status:** Accepted
+
+Business errors return `Result.Failure(new SomeError(...))`. Exceptions are reserved for programmer errors and infrastructure failures. Reasons:
+- Compile-time exhaustiveness — handlers must inspect `res.Error`.
+- Endpoint mapping is mechanical (`switch` on error type → HTTP code).
+- No exception-driven control flow / `try`-spam.

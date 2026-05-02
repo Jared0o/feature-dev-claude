@@ -1,0 +1,45 @@
+# {{ModuleName}} — Spec v1
+
+> Initial spec scaffolded by `/project-init:init` (or `/project-init:add-module`). Replace this with the actual product spec once requirements are stable.
+
+## Purpose
+
+(One paragraph: what this module is responsible for, what it explicitly is NOT responsible for.)
+
+## Entities
+
+- `{{Entity}}` — (one-line description)
+  - Properties: see `src/Modules/{{ModuleName}}/{{SolutionName}}.Modules.{{ModuleName}}.Core/Domain/{{Entity}}.cs`
+
+## Use cases (commands)
+
+- `Create{{Entity}}Command` — (when called, by whom, with what)
+- `Update{{Entity}}Command`
+- `Delete{{Entity}}Command`
+
+## Read models (queries)
+
+- `Get{{Entity}}ByIdQuery`
+- `Get{{Entity}}sQuery`
+
+## Events
+
+### Publishes
+- (e.g. `{{Entity}}CreatedEvent` — fired after a successful Create. Subscribers: ...)
+
+### Subscribes
+- (e.g. `UserDeactivatedEvent` from `Users` — fired when a user is deactivated; this module ...)
+
+## Errors
+
+- `{{Entity}}NotFoundError` — entity with given id does not exist.
+
+## Persistence
+
+- DbContext: `{{ModuleName}}DbContext`
+- Schema: `{{ModuleNameLower}}`
+- Connection string key: `{{ModuleName}}Context`
+
+## Open questions
+
+- (anything underspecified — write it here so it's not lost)

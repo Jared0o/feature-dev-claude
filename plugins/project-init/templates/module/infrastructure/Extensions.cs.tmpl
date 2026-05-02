@@ -1,0 +1,22 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+using {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Persistence;
+using {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Repositories;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure;
+
+public static class Extensions
+{
+    public static IServiceCollection Add{{ModuleName}}Infrastructure(
+        this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<{{ModuleName}}DbContext>(opts =>
+            opts.UseNpgsql(configuration.GetConnectionString("{{ModuleName}}Context")));
+
+        services.AddScoped<I{{Entity}}Repository, {{Entity}}Repository>();
+
+        return services;
+    }
+}

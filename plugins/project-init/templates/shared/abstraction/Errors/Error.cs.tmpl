@@ -1,0 +1,6 @@
+namespace {{SolutionName}}.Shared.Abstraction.Errors;
+
+public abstract record Error(string Message)
+{
+    public string Type => GetType().Name;
+}

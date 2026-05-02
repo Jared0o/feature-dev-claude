@@ -1,0 +1,45 @@
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Tests.Integration.Repositories;
+
+public sealed class {{Entity}}RepositoryTests({{ModuleName}}DbFixture fixture) : IClassFixture<{{ModuleName}}DbFixture>
+{
+    private readonly {{Entity}}Repository _sut = new(fixture.Db);
+
+    [Fact]
+    public async Task AddAsync_PersistsEntity()
+    {
+        fixture.Db.ChangeTracker.Clear();
+        var entity = fixture.Create{{Entity}}();
+
+        await _sut.AddAsync(entity);
+        fixture.Db.ChangeTracker.Clear();
+
+        var stored = await _sut.GetByIdAsync(entity.Id);
+        Assert.NotNull(stored);
+        Assert.Equal(entity.Id, stored.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenMissing_ReturnsNull()
+    {
+        fixture.Db.ChangeTracker.Clear();
+        var result = await _sut.GetByIdAsync(Guid.CreateVersion7());
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesEntity()
+    {
+        fixture.Db.ChangeTracker.Clear();
+        var entity = fixture.Create{{Entity}}();
+        await _sut.AddAsync(entity);
+        fixture.Db.ChangeTracker.Clear();
+
+        var loaded = await _sut.GetByIdAsync(entity.Id);
+        Assert.NotNull(loaded);
+        await _sut.DeleteAsync(loaded);
+        fixture.Db.ChangeTracker.Clear();
+
+        var afterDelete = await _sut.GetByIdAsync(entity.Id);
+        Assert.Null(afterDelete);
+    }
+}

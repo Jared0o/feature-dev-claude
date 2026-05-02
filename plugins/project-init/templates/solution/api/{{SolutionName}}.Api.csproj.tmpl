@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\{{SolutionName}}.Shared.Abstraction\{{SolutionName}}.Shared.Abstraction.csproj" />
+    <ProjectReference Include="..\..\Shared\{{SolutionName}}.Shared.Infrastructure\{{SolutionName}}.Shared.Infrastructure.csproj" />
+    <!-- Module .Api ProjectReferences are added by pi-wiring -->
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mediator.SourceGenerator">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Mediator.Abstractions" />
+  </ItemGroup>
+</Project>

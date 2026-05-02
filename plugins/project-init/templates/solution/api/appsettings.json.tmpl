@@ -1,0 +1,18 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+  },
+  "Jwt": {
+    "Secret": "CHANGE-ME-IN-PRODUCTION-MUST-BE-AT-LEAST-32-CHARS!!",
+    "Issuer": "{{SolutionNameLower}}-api",
+    "Audience": "{{SolutionNameLower}}-client",
+    "AccessTokenExpirationMinutes": 15,
+    "RefreshTokenExpirationDays": 7
+  }
+}

@@ -1,0 +1,31 @@
+# Architecture — {{SolutionName}}
+
+## Style
+
+Modular monolith. One ASP.NET Core process hosts every module. Modules are independent assemblies discovered by reflection at startup. Communication between modules is event-based (`INotification` / `INotificationHandler`), never direct method calls.
+
+## Layers per module
+
+```
+Core          ← domain entities, commands, queries, events, errors, DTOs, interfaces
+Infrastructure ← EF Core DbContext, EF configurations, repositories, migrations
+Api           ← IModule implementation + Minimal API endpoints
+```
+
+`Core` is the only project a sibling module is allowed to reference (and only for the sibling's published `INotification` types).
+
+## Cross-cutting
+
+- **Mediator** (`Mediator.SourceGenerator` registered ONLY in `{{SolutionName}}.Api`) wires all `ICommandHandler` / `IQueryHandler` / `INotificationHandler` by source-gen at compile time. No manual handler registration.
+- **`Result<T>`** in `{{SolutionName}}.Shared.Abstraction` represents success/failure. Errors are records inheriting `Error`, optionally `NotFoundError` / `UnauthorizedError` / `ValidationError` / `BaseError`.
+- **EF Core** with PostgreSQL. Each module has its own `DbContext` with its own schema (`HasDefaultSchema("{modulename}")`) so tables don't collide.
+- **Migrations** are applied at startup inside each module's `IModule.RegisterMiddleware` via `Apply{Module}Migrations`.
+
+## Auto-discovery
+
+`{{SolutionName}}.Api/ModuleLoader/ModuleLoader.cs` scans the `bin/` directory for assemblies whose name starts with `{{SolutionName}}.Modules.`, instantiates every concrete `IModule`, then per module:
+1. Calls `RegisterServices(IServiceCollection, IConfiguration)` during DI setup.
+2. Maps a route group at `/{module.RoutePrefix}` and calls `RegisterEndpoints(group)`.
+3. Awaits `RegisterMiddleware(IApplicationBuilder)` (this is where migrations apply).
+
+Adding a module = creating three projects + a `ProjectReference` from `{{SolutionName}}.Api.csproj` to the new `*.Api` project. Nothing in `Program.cs` changes.

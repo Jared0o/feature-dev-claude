@@ -1,0 +1,12 @@
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Domain;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+
+public interface I{{Entity}}Repository
+{
+    Task<{{Entity}}?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<(IReadOnlyList<{{Entity}}> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken ct = default);
+    Task AddAsync({{Entity}} entity, CancellationToken ct = default);
+    Task UpdateAsync({{Entity}} entity, CancellationToken ct = default);
+    Task DeleteAsync({{Entity}} entity, CancellationToken ct = default);
+}

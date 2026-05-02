@@ -1,0 +1,22 @@
+using Mediator;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Dtos;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+using {{SolutionName}}.Shared.Abstraction.Results;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core.Queries;
+
+public sealed record Get{{Entity}}sQuery(int Page = 1, int PageSize = 20) : IQuery<Result<PagedResult<{{Entity}}Dto>>>;
+
+public sealed class Get{{Entity}}sQueryHandler(I{{Entity}}Repository repository)
+    : IQueryHandler<Get{{Entity}}sQuery, Result<PagedResult<{{Entity}}Dto>>>
+{
+    public async ValueTask<Result<PagedResult<{{Entity}}Dto>>> Handle(Get{{Entity}}sQuery query, CancellationToken ct)
+    {
+        var (items, total) = await repository.GetPagedAsync(query.Page, query.PageSize, ct);
+        var dtos = items
+            .Select(e => new {{Entity}}Dto(e.Id{{EntityPropertiesMapperPrefixComma}}, e.CreatedAt, e.UpdatedAt))
+            .ToList();
+        return Result<PagedResult<{{Entity}}Dto>>.Success(
+            new PagedResult<{{Entity}}Dto>(dtos, total, query.Page, query.PageSize));
+    }
+}

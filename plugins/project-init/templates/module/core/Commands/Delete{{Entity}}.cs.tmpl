@@ -1,0 +1,22 @@
+using Mediator;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Errors;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+using {{SolutionName}}.Shared.Abstraction.Results;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core.Commands;
+
+public sealed record Delete{{Entity}}Command(Guid Id) : ICommand<Result>;
+
+public sealed class Delete{{Entity}}CommandHandler(I{{Entity}}Repository repository)
+    : ICommandHandler<Delete{{Entity}}Command, Result>
+{
+    public async ValueTask<Result> Handle(Delete{{Entity}}Command cmd, CancellationToken ct)
+    {
+        var entity = await repository.GetByIdAsync(cmd.Id, ct);
+        if (entity is null)
+            return Result.Failure(new {{Entity}}NotFoundError(cmd.Id));
+
+        await repository.DeleteAsync(entity, ct);
+        return Result.Success();
+    }
+}

@@ -1,0 +1,28 @@
+using Mediator;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Dtos;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Errors;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+using {{SolutionName}}.Shared.Abstraction.Results;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core.Queries;
+
+public sealed record Get{{Entity}}ByIdQuery(Guid Id) : IQuery<Result<{{Entity}}Dto>>;
+
+public sealed class Get{{Entity}}ByIdQueryHandler(I{{Entity}}Repository repository)
+    : IQueryHandler<Get{{Entity}}ByIdQuery, Result<{{Entity}}Dto>>
+{
+    public async ValueTask<Result<{{Entity}}Dto>> Handle(Get{{Entity}}ByIdQuery query, CancellationToken ct)
+    {
+        var entity = await repository.GetByIdAsync(query.Id, ct);
+        if (entity is null)
+            return Result<{{Entity}}Dto>.Failure(new {{Entity}}NotFoundError(query.Id));
+
+        return Result<{{Entity}}Dto>.Success(MapToDto(entity));
+    }
+
+    private static {{Entity}}Dto MapToDto({{SolutionName}}.Modules.{{ModuleName}}.Core.Domain.{{Entity}} e)
+    {
+        // TODO: replace with explicit property mapping
+        return new {{Entity}}Dto(e.Id{{EntityPropertiesMapperPrefixComma}}, e.CreatedAt, e.UpdatedAt);
+    }
+}

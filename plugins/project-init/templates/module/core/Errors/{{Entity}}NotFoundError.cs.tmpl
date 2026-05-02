@@ -1,0 +1,6 @@
+using {{SolutionName}}.Shared.Abstraction.Errors;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core.Errors;
+
+public record {{Entity}}NotFoundError(Guid Id)
+    : NotFoundError($"{{Entity}} '{Id}' was not found.");

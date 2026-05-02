@@ -1,0 +1,32 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using {{SolutionName}}.Modules.{{ModuleName}}.Api.Endpoints;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core;
+using {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure;
+using {{SolutionName}}.Modules.{{ModuleName}}.Infrastructure.Migrations;
+using {{SolutionName}}.Shared.Abstraction.Module;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Api;
+
+public sealed class {{ModuleName}}Module : IModule
+{
+    public string Name => "{{ModuleName}}";
+    public string RoutePrefix => "api";
+    public bool Enabled => true;
+
+    public void RegisterServices(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Add{{ModuleName}}Core();
+        services.Add{{ModuleName}}Infrastructure(configuration);
+    }
+
+    public void RegisterEndpoints(RouteGroupBuilder routeBuilder)
+    {
+        routeBuilder.Map{{Entity}}Endpoints();
+    }
+
+    public async Task RegisterMiddleware(IApplicationBuilder app)
+        => await Apply{{ModuleName}}Migrations.ApplyAsync(app.ApplicationServices);
+}

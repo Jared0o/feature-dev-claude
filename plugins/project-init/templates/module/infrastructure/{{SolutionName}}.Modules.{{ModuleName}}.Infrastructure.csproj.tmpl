@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>{{SolutionName}}.Modules.{{ModuleName}}.Tests.Integration</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\{{SolutionName}}.Modules.{{ModuleName}}.Core\{{SolutionName}}.Modules.{{ModuleName}}.Core.csproj" />
+    <ProjectReference Include="..\..\..\Shared\{{SolutionName}}.Shared.Infrastructure\{{SolutionName}}.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+</Project>

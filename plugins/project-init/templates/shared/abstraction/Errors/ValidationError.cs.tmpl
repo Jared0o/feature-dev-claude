@@ -1,0 +1,6 @@
+namespace {{SolutionName}}.Shared.Abstraction.Errors;
+
+public record ValidationError(string Message, IReadOnlyList<ValidationFailureDetail> Errors)
+    : Error(Message);
+
+public record ValidationFailureDetail(string PropertyName, string ErrorMessage);

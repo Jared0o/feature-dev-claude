@@ -1,0 +1,35 @@
+using FluentValidation;
+using Mediator;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Domain;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+using {{SolutionName}}.Shared.Abstraction.Results;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core.Commands;
+
+public sealed record Create{{Entity}}Command({{EntityPropertiesCtor}}) : ICommand<Result<Guid>>;
+
+public sealed class Create{{Entity}}CommandHandler(I{{Entity}}Repository repository)
+    : ICommandHandler<Create{{Entity}}Command, Result<Guid>>
+{
+    public async ValueTask<Result<Guid>> Handle(Create{{Entity}}Command cmd, CancellationToken ct)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var entity = new {{Entity}}
+        {
+            Id = Guid.CreateVersion7(),
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+        // TODO: copy properties from cmd onto entity
+        await repository.AddAsync(entity, ct);
+        return Result<Guid>.Success(entity.Id);
+    }
+}
+
+public sealed class Create{{Entity}}CommandValidator : AbstractValidator<Create{{Entity}}Command>
+{
+    public Create{{Entity}}CommandValidator()
+    {
+        // TODO: add validation rules per property
+    }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "project-init",
+  "version": "0.1.0",
+  "description": ".NET 10 modular monolith scaffolder — initializes a solution and adds modules following the architecture of Jared0o/Ecommerce (Mediator, Result<T>, EF Core+Postgres, xunit+Testcontainers).",
+  "author": { "name": "Jaroslaw Przybyl" },
+  "repository": "https://github.com/Jared0o/claude-plugins",
+  "license": "MIT"
+}

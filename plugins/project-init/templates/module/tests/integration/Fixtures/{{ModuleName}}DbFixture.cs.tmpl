@@ -1,0 +1,47 @@
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Tests.Integration.Fixtures;
+
+public sealed class {{ModuleName}}DbFixture : IAsyncLifetime
+{
+    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
+        .WithImage("postgres:17-alpine")
+        .Build();
+
+    public {{ModuleName}}DbContext Db { get; private set; } = default!;
+
+    private IServiceScope _scope = default!;
+    private ServiceProvider _provider = default!;
+
+    public async Task InitializeAsync()
+    {
+        await _postgres.StartAsync();
+
+        var services = new ServiceCollection();
+        services.AddDbContext<{{ModuleName}}DbContext>(opts =>
+            opts.UseNpgsql(_postgres.GetConnectionString()));
+        services.AddLogging();
+
+        _provider = services.BuildServiceProvider();
+        _scope = _provider.CreateScope();
+
+        Db = _scope.ServiceProvider.GetRequiredService<{{ModuleName}}DbContext>();
+        await Db.Database.EnsureCreatedAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        _scope.Dispose();
+        await _provider.DisposeAsync();
+        await _postgres.DisposeAsync();
+    }
+
+    public {{Entity}} Create{{Entity}}()
+    {
+        var now = DateTimeOffset.UtcNow;
+        return new {{Entity}}
+        {
+            Id = Guid.CreateVersion7(),
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+    }
+}

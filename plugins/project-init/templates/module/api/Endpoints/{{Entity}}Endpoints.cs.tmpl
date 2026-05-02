@@ -1,0 +1,92 @@
+using Mediator;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Commands;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Dtos;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Errors;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Queries;
+using {{SolutionName}}.Shared.Abstraction.Errors;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Api.Endpoints;
+
+internal static class {{Entity}}Endpoints
+{
+    internal static RouteGroupBuilder Map{{Entity}}Endpoints(this RouteGroupBuilder group)
+    {
+        var g = group.MapGroup("/{{EntityLower}}s").WithTags("{{Entity}}");
+
+        g.MapGet("/", List).WithName("Get{{Entity}}s").Produces<PagedResult<{{Entity}}Dto>>();
+        g.MapGet("/{id:guid}", GetById).WithName("Get{{Entity}}").Produces<{{Entity}}Dto>().Produces(404);
+        g.MapPost("/", Create).WithName("Create{{Entity}}").Produces<Guid>(201).Produces(400);
+        g.MapPut("/{id:guid}", Update).WithName("Update{{Entity}}").Produces(200).Produces(400).Produces(404);
+        g.MapDelete("/{id:guid}", Delete).WithName("Delete{{Entity}}").Produces(204).Produces(404);
+
+        return group;
+    }
+
+    private static async Task<IResult> List(
+        [FromQuery] int page, [FromQuery] int pageSize,
+        IMediator mediator, CancellationToken ct)
+    {
+        var res = await mediator.Send(new Get{{Entity}}sQuery(page <= 0 ? 1 : page, pageSize <= 0 ? 20 : pageSize), ct);
+        return res.IsSuccess
+            ? Results.Ok(res.Value)
+            : Results.Problem("An unexpected error occurred.");
+    }
+
+    private static async Task<IResult> GetById(Guid id, IMediator mediator, CancellationToken ct)
+    {
+        var res = await mediator.Send(new Get{{Entity}}ByIdQuery(id), ct);
+        if (res.IsSuccess) return Results.Ok(res.Value);
+
+        return res.Error switch
+        {
+            {{Entity}}NotFoundError e => Results.NotFound(new { e.Type, e.Message }),
+            _                          => Results.Problem("An unexpected error occurred.")
+        };
+    }
+
+    private static async Task<IResult> Create(
+        [FromBody] Create{{Entity}}Command cmd, IMediator mediator, CancellationToken ct)
+    {
+        var res = await mediator.Send(cmd, ct);
+        if (res.IsSuccess) return Results.Created($"/api/{{EntityLower}}s/{res.Value}", res.Value);
+
+        return res.Error switch
+        {
+            ValidationError e => Results.BadRequest(new { e.Type, e.Message, e.Errors }),
+            BaseError e       => Results.BadRequest(new { e.Type, e.Message }),
+            _                 => Results.Problem("An unexpected error occurred.")
+        };
+    }
+
+    private static async Task<IResult> Update(
+        Guid id, [FromBody] Update{{Entity}}Command body, IMediator mediator, CancellationToken ct)
+    {
+        var cmd = body with { Id = id };
+        var res = await mediator.Send(cmd, ct);
+        if (res.IsSuccess) return Results.Ok();
+
+        return res.Error switch
+        {
+            {{Entity}}NotFoundError e => Results.NotFound(new { e.Type, e.Message }),
+            ValidationError e          => Results.BadRequest(new { e.Type, e.Message, e.Errors }),
+            BaseError e                => Results.BadRequest(new { e.Type, e.Message }),
+            _                          => Results.Problem("An unexpected error occurred.")
+        };
+    }
+
+    private static async Task<IResult> Delete(Guid id, IMediator mediator, CancellationToken ct)
+    {
+        var res = await mediator.Send(new Delete{{Entity}}Command(id), ct);
+        if (res.IsSuccess) return Results.NoContent();
+
+        return res.Error switch
+        {
+            {{Entity}}NotFoundError e => Results.NotFound(new { e.Type, e.Message }),
+            _                          => Results.Problem("An unexpected error occurred.")
+        };
+    }
+}

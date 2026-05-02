@@ -1,0 +1,83 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Deep-dive references: `.claude/architecture.md`, `.claude/conventions.md`, `.claude/modules.md`, `.claude/testing.md`, `.claude/decisions.md`.
+
+---
+
+## Git workflow
+
+**Never commit directly to `main`.** Every code change must happen on a dedicated branch:
+
+```bash
+git checkout -b {type}/{short-description}   # e.g. feat/orders-module, fix/result-type
+git push -u origin HEAD
+gh pr create
+```
+
+---
+
+## Quick orientation
+
+**.NET 10 Modular Monolith** — `{{SolutionName}}`. Modules are **auto-discovered at runtime via reflection** by `{{SolutionName}}.Api/ModuleLoader/ModuleLoader.cs`. The only manual wiring in `{{SolutionName}}.Api.csproj` is a `ProjectReference` to each module's `*.Api` project.
+
+Before writing any code, answer:
+1. Which module?
+2. Which layer? (`Core` = domain/use cases, `Infrastructure` = EF/repos, `Api` = endpoints / `IModule`)
+3. Is there an existing pattern to follow? Check `.claude/conventions.md`.
+
+---
+
+## Non-negotiable rules
+
+- **Every feature must have tests** — unit for handlers, integration for repositories.
+- **Never throw for business errors** — return `Result` / `Result<T>`.
+- **Never use `Guid.NewGuid()`** — use `Guid.CreateVersion7()`.
+- **Never add `Version=` to `<PackageReference>`** — versions live in `Directory.Packages.props`.
+- **Never register modules manually in `Program.cs`** — `ModuleLoader` handles discovery.
+- **Always use `ICommand` / `IQuery` / `INotification`** from `Mediator.Abstractions`, not MediatR.
+- **Handlers return `ValueTask<T>`**, not `Task<T>`.
+- **Modules cannot reference each other's `Infrastructure` or `Api` projects** — only `Core` (for event types).
+
+---
+
+## Project structure
+
+```
+src/
+  Api/
+    {{SolutionName}}.Api/                                ← entry point; references all *.Api modules
+  Modules/
+    {Name}/
+      {{SolutionName}}.Modules.{Name}.Core/              ← domain, commands, queries, errors, DTOs, interfaces
+      {{SolutionName}}.Modules.{Name}.Infrastructure/    ← EF DbContext, repos, migrations
+      {{SolutionName}}.Modules.{Name}.Api/               ← IModule impl, endpoints
+  Shared/
+    {{SolutionName}}.Shared.Abstraction/                 ← Result<T>, IModule, shared errors
+    {{SolutionName}}.Shared.Infrastructure/              ← EF base config, Npgsql helpers
+tests/
+  {{SolutionName}}.Modules.{Name}.Tests.Unit/
+  {{SolutionName}}.Modules.{Name}.Tests.Integration/
+```
+
+---
+
+## Modules in this solution
+
+{{ModulesList}}
+
+See `.claude/modules.md` for module descriptions and event flow.
+
+---
+
+## Commands
+
+```bash
+dotnet build {{SolutionName}}.slnx                                 # build everything
+dotnet test                                                         # run all tests
+dotnet run --project src/Api/{{SolutionName}}.Api                   # start API (http://localhost:5000/scalar)
+dotnet ef migrations add {Name} \
+  --project src/Modules/{Name}/{{SolutionName}}.Modules.{Name}.Infrastructure \
+  --startup-project src/Api/{{SolutionName}}.Api \
+  --context {Name}DbContext
+```

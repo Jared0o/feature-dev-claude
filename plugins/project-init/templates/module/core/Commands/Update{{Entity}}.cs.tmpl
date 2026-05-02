@@ -1,0 +1,34 @@
+using FluentValidation;
+using Mediator;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Errors;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Interfaces;
+using {{SolutionName}}.Shared.Abstraction.Results;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core.Commands;
+
+public sealed record Update{{Entity}}Command(Guid Id{{EntityPropertiesCtorPrefixComma}}) : ICommand<Result>;
+
+public sealed class Update{{Entity}}CommandHandler(I{{Entity}}Repository repository)
+    : ICommandHandler<Update{{Entity}}Command, Result>
+{
+    public async ValueTask<Result> Handle(Update{{Entity}}Command cmd, CancellationToken ct)
+    {
+        var entity = await repository.GetByIdAsync(cmd.Id, ct);
+        if (entity is null)
+            return Result.Failure(new {{Entity}}NotFoundError(cmd.Id));
+
+        // TODO: copy properties from cmd onto entity
+        entity.UpdatedAt = DateTimeOffset.UtcNow;
+        await repository.UpdateAsync(entity, ct);
+        return Result.Success();
+    }
+}
+
+public sealed class Update{{Entity}}CommandValidator : AbstractValidator<Update{{Entity}}Command>
+{
+    public Update{{Entity}}CommandValidator()
+    {
+        RuleFor(x => x.Id).NotEmpty();
+        // TODO: add validation rules per property
+    }
+}

@@ -1,0 +1,14 @@
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+using {{SolutionName}}.Modules.{{ModuleName}}.Core.Commands;
+
+namespace {{SolutionName}}.Modules.{{ModuleName}}.Core;
+
+public static class Extensions
+{
+    public static IServiceCollection Add{{ModuleName}}Core(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssemblyContaining<Create{{Entity}}CommandValidator>();
+        return services;
+    }
+}
